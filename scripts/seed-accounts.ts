@@ -54,7 +54,7 @@ const skills=['home-cleaning','ac-service-repair','womens-salon','mens-grooming'
 const citySlugs=['noida','delhi','gurugram','bengaluru','mumbai'];
 const customer=await ensureUser('+919999100001','Demo Customer');
 checked(await supabase.from('profiles').update({name:'Demo Customer',city_id:cityMap.get('noida')}).eq('id',customer.id),'customer profile');
-const service = checked(await supabase.from('services').select('id,name,price,mrp,duration_minutes').eq('slug','ac-basic-service').single(),'sample service');
+const service = checked(await supabase.from('services').select('id,name,price,mrp,duration_minutes').eq('slug','ac-basic-service').single(),'sample service') as {id:string;name:string;price:number;mrp:number;duration_minutes:number};
 
 for(let i=0;i<20;i++) {
   const phone=`+9199990${String(i+1).padStart(5,'0')}`;
@@ -81,7 +81,7 @@ for(let i=0;i<20;i++) {
     scheduled_date:day,slot_start:'10:00:00',slot_end:'11:00:00',status:'completed',
     subtotal:service.price,mrp_total:service.mrp,discount:0,visit_fee:49,tax:9,total:service.price+58,
     payment_method:'cash',payment_status:'captured',start_pin:'2468',
-  },{onConflict:'code'}).select('id').single(),`booking ${i}`);
+  },{onConflict:'code'}).select('id').single(),`booking ${i}`) as {id:string};
   const itemExisting=checked(await supabase.from('booking_items').select('id').eq('booking_id',booking.id).limit(1),'item lookup');
   if(itemExisting.length===0)checked(await supabase.from('booking_items').insert({booking_id:booking.id,service_id:service.id,
     name:service.name,unit_price:service.price,qty:1,duration_minutes:service.duration_minutes}),`item ${i}`);
