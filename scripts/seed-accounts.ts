@@ -20,7 +20,7 @@ if (!['127.0.0.1','localhost'].includes(host)) {
 const supabase = createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
 function checked<T>(result:{data:T,error: {message:string} | null},label:string):T {
   if(result.error) throw new Error(`${label}: ${result.error.message}`);
-  return result.data;
+  return result.data as NonNullable<T>;
 }
 async function ensureUser(phone:string,name:string):Promise<User> {
   for(let page=1;page<=10;page++) {
