@@ -1,0 +1,18 @@
+'use client';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, Minus, Plus, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { useCart } from '@/lib/cart-store';
+import { money } from '@/lib/catalog';
+export default function CartPage() {
+ const [hydrated,setHydrated]=useState(false);
+ useEffect(()=>setHydrated(true),[]);
+ const lines=useCart(s=>s.lines),setQty=useCart(s=>s.setQty),clear=useCart(s=>s.clear);
+ const subtotal=lines.reduce((n,x)=>n+x.qty*x.price,0);
+ const mrp=lines.reduce((n,x)=>n+x.qty*x.mrp,0);
+ const visit=subtotal>=999?0:49;
+ const tax=Math.round(visit*0.18);
+ return <main className="mx-auto max-w-4xl px-5 py-10"><Link href="/" className="inline-flex min-h-11 items-center gap-2 text-sm text-primary"><ArrowLeft size={17}/> Browse services</Link><h1 className="mt-4 font-display text-4xl font-bold">Your cart</h1>
+ {!hydrated?<p className="mt-8 text-muted-foreground">Loading cart...</p>:lines.length===0?<section className="mt-10 rounded-2xl border border-dashed p-12 text-center"><ShoppingBag size={36} className="mx-auto text-primary"/><h2 className="mt-4 text-xl font-semibold">Your cart is empty</h2><p className="mt-2 text-muted-foreground">Explore services and add what your home needs.</p><Link href="/" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-primary px-6 font-bold text-primary-foreground">Explore services</Link></section>:
+ <div className="mt-8 grid gap-6 md:grid-cols-[1fr_300px]"><section className="space-y-3">{lines.map(line=><article key={line.id} className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-5"><div><Link href={`/services/${line.slug}`} className="font-semibold hover:underline">{line.name}</Link><p className="mt-1 text-sm text-muted-foreground">{money(line.price)} · {line.duration_minutes} min</p></div><div className="flex items-center gap-2"><button aria-label={`Remove one ${line.name}`} type="button" onClick={()=>setQty(line.id,line.qty-1)} className="grid size-11 place-items-center rounded-xl border"><Minus size={17}/></button><b>{line.qty}</b><button aria-label={`Add one ${line.name}`} disabled={line.qty>=20} type="button" onClick={()=>setQty(line.id,line.qty+1)} className="grid size-11 place-items-center rounded-xl border"><Plus size={17}/></button></div></article>)}<button onClick={clear} type="button" className="min-h-11 text-sm text-muted-foreground underline">Remove all</button></section><aside className="h-fit rounded-2xl border bg-card p-6"><h2 className="font-display text-xl font-bold">Price summary</h2><dl className="mt-5 space-y-3 text-sm"><div className="flex justify-between"><dt>Service MRP</dt><dd>{money(mrp)}</dd></div><div className="flex justify-between text-primary"><dt>Service savings</dt><dd>-{money(mrp-subtotal)}</dd></div><div className="flex justify-between"><dt>Visit fee</dt><dd>{visit===0?'Free':money(visit)}</dd></div><div className="flex justify-between"><dt>GST on visit fee</dt><dd>{money(tax)}</dd></div><div className="flex justify-between border-t pt-4 text-lg font-bold"><dt>Estimated total</dt><dd>{money(subtotal+visit+tax)}</dd></div></dl><p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground"><ShieldCheck size={17} className="shrink-0"/>Prices shown are estimates; checkout must revalidate all prices and availability.</p><p className="mt-5 rounded-xl bg-secondary p-3 text-xs text-muted-foreground">Online booking and payment are not yet enabled. Your cart remains saved on this device.</p><Link href="/login" className="mt-4 flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 font-semibold text-primary-foreground">Sign in to Nestfix</Link></aside></div>}</main>;
+}
