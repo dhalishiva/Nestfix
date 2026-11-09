@@ -18,7 +18,7 @@ if (!['127.0.0.1','localhost'].includes(host)) {
   throw new Error('Refusing to create placeholder demo identities outside local Supabase.');
 }
 const supabase = createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
-function checked<T>(result:{data:T | null,error: {message:string} | null},label:string):T {
+function checked<T>(result:{data:T | null,error: {message:string} | null},label:string): NonNullable<T> {
   if(result.error) throw new Error(`${label}: ${result.error.message}`);
   return result.data as NonNullable<T>;
 }

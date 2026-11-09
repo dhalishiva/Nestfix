@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 
 export type Category = { id: string; slug: string; name: string; icon: string; colour: string };
 export type Service = { id: string; slug: string; name: string; description: string; price: number; mrp: number; duration_minutes: number; includes: string[]; excludes: string[]; tags: string[]; rating_avg: number; rating_count: number; image_url: string | null; category_slug: string; category_name: string; category_id: string; subcategory_name: string };
-export const money = (n: number) => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(n);
 
 function adaptService(row: Record<string, unknown>): Service {
   const sub = row.subcategories as { name: string; categories: Category };

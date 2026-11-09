@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, BadgeCheck, CalendarClock, Search, ShieldCheck, Sparkles, Star, Tag, Truck } from 'lucide-react';
 import { AddServiceButton } from '@/components/customer/add-service-button';
 import type { Category, Service } from '@/lib/catalog';
-import { money } from '@/lib/catalog';
+import { money } from '@/lib/utils/currency';
 import { useCart } from '@/lib/cart-store';
 
 export function CatalogBrowser({categories,services}:{categories:Category[],services:Service[]}) {

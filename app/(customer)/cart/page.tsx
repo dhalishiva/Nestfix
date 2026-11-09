@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Minus, Plus, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/lib/cart-store';
-import { money } from '@/lib/catalog';
+import { money } from '@/lib/utils/currency';
 export default function CartPage() {
  const [hydrated,setHydrated]=useState(false);
  useEffect(()=>setHydrated(true),[]);

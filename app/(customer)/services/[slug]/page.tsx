@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Check, Clock3, ShieldCheck, X } from 'lucide-react';
 import { AddServiceButton } from '@/components/customer/add-service-button';
-import { loadService, money } from '@/lib/catalog';
+import { loadService } from '@/lib/catalog';
+import { money } from '@/lib/utils/currency';
 export const dynamic = 'force-dynamic';
 export default async function ServiceDetail({params}:{params:Promise<{slug:string}>}) {
  const {slug}=await params;
