@@ -1,65 +1,68 @@
-# Nestfix — Indian home-services marketplace
+# Nestfix
 
-**Current state (10 November 2026): deployed customer catalog MVP; full booking marketplace is NOT complete.**
+A home-services marketplace for Indian cities: customers book cleaning, AC repair, salon at home, electricians, plumbers and more in fixed-price time slots, and a professional is assigned automatically. An admin dashboard runs bookings, professionals, prices and offers.
 
-- **Live production:** https://nestfix-nine.vercel.app (Vercel reports READY)
-- **Repository:** https://github.com/dhalishiva/Nestfix
-- **Database:** Supabase project `qbishtwkusrjffpfpbnf`, 29 RLS-enabled tables.
-- **Stack:** Next.js 15, TypeScript, Tailwind CSS, Supabase Postgres/Auth, Zustand, Zod, Vitest, Playwright.
+**Live:** https://nestfix-nine.vercel.app
 
-## Implemented and deployed
+## Stack
 
-- Original branded responsive homepage using the real Supabase service catalog, with service search and category filtering.
-- Service detail routes (`/services/[slug]`) with description, duration, inclusions, exclusions, pricing and cart controls.
-- Device-persistent guest cart (`/cart`) with steppers, line totals, indicative visit fee and GST.
-- Phone OTP sign-in UI (`/login`) using Supabase Auth; **delivery requires configuring an SMS provider in Supabase**.
-- Customer saved-address list, add/edit/delete, PIN-code serviceability checks (`/addresses`); requires a verified user.
-- Protected informational pro and admin screens (real management features not implemented).
-- Database migrations, RLS policies, storage buckets, and seeded reference data.
+- **Frontend:** React 18 + TypeScript + Vite, React Router. Hand-written CSS with light and dark themes.
+- **Backend:** Supabase (Postgres, Auth, Realtime). All business rules live in Postgres functions, so prices, slots and bookings can't be faked from the browser.
+- **Hosting:** Vercel, deployed on every push to `main`.
 
-## Verified infrastructure
+## What works
 
-- Vercel production deployment `dpl_H5NQ1VgSPwaaq4byhp6LFSqj47uk` completed with a successful Next.js build, deployment state **READY**.
-- Supabase migrations `initial_schema` and `rls_storage` applied.
-- Supabase seeded **5 cities, 35 PIN codes, 11 categories, 46 services**.
-- **29 of 29** application tables have RLS enabled; Supabase security advisor reported zero findings at the time of inspection.
+| Area | Features |
+|---|---|
+| Browse | Categories, services, search, service details, city picker |
+| Cart | Server-priced cart, coupons with live eligibility, free visit over ₹999 |
+| Auth | Email + password sign up and log in, password reset |
+| Checkout | Saved addresses, live slot availability for the next 7 days, payment choice (online payment is simulated) |
+| Bookings | Auto-assigned professional, start PIN, live status, reschedule, cancel with refund rules, rating, book again |
+| Admin | Overview, all bookings with filters, assign or reassign pros, move jobs through on the way → started (PIN check) → completed, cancel with refund, manage pros, prices and offers |
 
-## Not yet implemented
+## Business rules (in `supabase/migrations/…_functions.sql`)
 
-**Do not take payments or accept real bookings yet.** The complete job slot engine, payment holds, professional eligibility and assignments, checkout, booking state transitions, cancellations/refunds, reviews, earnings, admin CRUD, notifications, Razorpay live integration, real pro onboarding, E2E booking coverage, and production hardening are still unfinished. The current cart displays estimated prices and deliberately does **not** create bookings or collect payments.
+- **Pricing:** `price_cart` computes item total, MRP savings, coupon discount and a ₹49 visit fee waived at ₹999+.
+- **Coupons:** `FIRST20` (20% up to ₹300, first booking, min ₹299), `NEST100` (₹100 off over ₹499), `SAVE250` (₹250 off over ₹2,499).
+- **Slots:** hourly from 8 AM to 7 PM, today plus 6 days, at least 90 minutes ahead, and the job must finish by 9 PM. A slot is open only if an active professional in that city has all the needed skills and is free for the full job length.
+- **Booking:** `create_booking` re-prices on the server, locks the city and day to prevent double-booking, and assigns the best free professional.
+- **Changes:** free reschedule or cancel up to 3 hours before the slot. Later cancellations of prepaid bookings keep ₹100.
+- **Status flow:** confirmed → pro assigned → on the way → in progress (needs the customer's PIN) → completed.
 
-No production SMS service, Razorpay secrets, or service-role key has been configured. In production, onboarding verified professionals and privileged admin account setup are also pending. Local demo identity seeding is intentionally prohibited against hosted Supabase.
-
-## Local installation
-
-Requires Node 22+, pnpm 9.15.4, network access, local Supabase CLI and Docker.
+## Run locally
 
 ```bash
-corepack enable
-corepack prepare pnpm@9.15.4 --activate
-pnpm install
-cp .env.example .env.local
-# Configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
-# For local Supabase only:
-supabase start
-supabase db reset
-pnpm dev
+npm install
+cp .env.example .env.local   # fill in your Supabase URL and anon key
+npm run dev
 ```
 
-## Testing
+## Database
 
-```bash
-pnpm test:static
-pnpm typecheck
-pnpm lint
-pnpm test
-pnpm test:e2e
+Migrations are in `supabase/migrations`, applied in order:
+
+1. `reset` clears objects from earlier versions
+2. `schema` creates tables, Row Level Security and the new-user trigger
+3. `functions` adds pricing, slots, booking and admin functions
+4. `seed` loads 5 cities, 11 categories, 36 services, 3 coupons and 60 sample professionals
+
+The catalog, ratings and professionals are sample data. Replace them before going live.
+
+### Make someone an admin
+
+After the person signs up, run this in the Supabase SQL editor:
+
+```sql
+update public.profiles set role = 'admin'
+where id = (select id from auth.users where email = 'person@example.com');
 ```
 
-No complete customer booking-to-pro-payment-to-review Playwright test has passed. A successful Vercel build alone does not establish end-to-end functional completeness.
+### Supabase Auth settings
 
-## Deployment and credentials
+In **Authentication → URL Configuration**, set the Site URL to `https://nestfix-nine.vercel.app` and add `https://nestfix-nine.vercel.app/**` to Redirect URLs, so confirmation and reset links come back to the site.
 
-Production on Vercel is Git-connected to the `main` branch. It has public Supabase URL and publishable key configured. **Never expose a Supabase service-role key or Razorpay secret as a `NEXT_PUBLIC_*` variable.** Configure Supabase Auth phone SMS delivery under the project dashboard before advertising sign-in as operational.
+## Not built yet
 
-For a full specification, see the original Nestfix request accompanying the project. Implement server-side booking state and pricing/availability verification before enabling checkout.
+- Real payments (Razorpay), SMS/WhatsApp notifications, phone OTP login
+- A separate app for professionals (for now, admins move jobs through each status)

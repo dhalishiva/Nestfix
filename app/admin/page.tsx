@@ -1,2 +1,0 @@
-import { ShieldCheck } from 'lucide-react';
-export default function AdminHome() {return <main className="mx-auto max-w-xl px-6 py-24"><ShieldCheck className="text-primary" size={36}/><h1 className="mt-5 font-display text-4xl font-bold">Nestfix Operations</h1><p className="mt-3 text-muted-foreground">The restricted operations workspace. Dashboards, booking tools and catalog management arrive in Phase 5.</p></main>;}

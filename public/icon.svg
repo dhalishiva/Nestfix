@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">Nestfix</title>
-  <rect x="1" y="1" width="62" height="62" rx="17" fill="#15543d"/>
-  <path d="M12 31.5 32 14l20 17.5" fill="none" stroke="#f9f3e8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M20 31v21h24V31M30.5 39v9M26 43.5h9" fill="none" stroke="#f9f3e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

@@ -1,2 +1,0 @@
-import { BadgeCheck } from 'lucide-react';
-export default function ProHome() {return <main className="mx-auto max-w-xl px-6 py-24"><BadgeCheck className="text-primary" size={36}/><h1 className="mt-5 font-display text-4xl font-bold">Nestfix for Pros</h1><p className="mt-3 text-muted-foreground">Your verified professional workspace. Onboarding, jobs and earnings are scheduled for Phase 4.</p></main>;}
