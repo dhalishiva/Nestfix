@@ -59,5 +59,9 @@
     "typescript": "5.8.2",
     "vitest": "3.0.9",
     "@eslint/eslintrc": "3.3.1"
+  },
+  "overrides": {
+    "motion-dom": "12.6.3",
+    "motion-utils": "12.6.3"
   }
 }
